@@ -1,3 +1,30 @@
+Content-Type: multipart/mixed; boundary="//"
+MIME-Version: 1.0
+
+--//
+Content-Type: text/cloud-config; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="cloud-config.txt"
+
+#cloud-config
+cloud_final_modules:
+- [scripts-user, always]
+
+--//
+Content-Type: text/x-shellscript; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="userdata.txt"
+
+#!/bin/bash
+sudo echo nameserver 8.8.8.8 > /etc/resolv.conf
+sudo amazon-linux-extras install epel -y
+sudo yum update -y
+python3 install pip
+mkdir -p /alpha_clients
+
+cat <<'EOT' > /app.py
 #Server flask web app
 from flask import Flask, request, jsonify
 import os
@@ -28,3 +55,9 @@ def display_ssh_attempts():
 # main driver function
 if __name__ == '__main__':
 	app.run(host='0.0.0.0', port=5000)
+EOT
+
+sudo chmod 755 /app.py
+
+/app.py
+--//--
