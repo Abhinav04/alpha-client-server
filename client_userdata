@@ -1,0 +1,43 @@
+Content-Type: multipart/mixed; boundary="//"
+MIME-Version: 1.0
+
+--//
+Content-Type: text/cloud-config; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="cloud-config.txt"
+
+#cloud-config
+cloud_final_modules:
+- [scripts-user, always]
+
+--//
+Content-Type: text/x-shellscript; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="userdata.txt"
+
+#!/bin/bash
+sudo amazon-linux-extras install epel -y
+sudo yum update
+sudo yum install inotify-tools
+
+cat <<EOF > /trigger.sh
+#!/bin/sh
+#intofiywait - watch for file modification
+while inotifywait -e modify /var/log/secure; do
+  /send_data.sh
+done
+EOF
+
+cat <<EOF > /send_data.sh
+#!/bin/sh
+attempts=$(journalctl _SYSTEMD_UNIT=sshd.service | egrep -o "sshd\[[0-9]*\]: (Failure|Accepted|Invalid)" | wc -l)
+node_hostname=$(hostname)
+echo $attempts
+echo $node_hostname
+curl -i -H "Content-Type: application/json" -X POST -d "{\"node_hostname\":\"$node_hostname\", \"ssh_attempts\":\"$attempts\"}" http://172.31.95.42:5000
+EOF
+
+/trigger.sh
+--//--
