@@ -19,9 +19,7 @@ Content-Disposition: attachment; filename="userdata.txt"
 
 #!/bin/bash
 sudo echo nameserver 8.8.8.8 > /etc/resolv.conf
-sudo amazon-linux-extras install epel -y
-sudo yum update -y
-python3 install pip
+sudo pip3 install flask
 mkdir -p /alpha_clients
 
 cat <<'EOT' > /app.py
@@ -59,5 +57,5 @@ EOT
 
 sudo chmod 755 /app.py
 
-/app.py
+python3 /app.py
 --//--
