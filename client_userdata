@@ -18,28 +18,28 @@ Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="userdata.txt"
 
 #!/bin/bash
-sudo amazon-linux-extras install epel -y
-sudo yum update
-sudo yum install inotify-tools
 sudo echo nameserver 8.8.8.8 > /etc/resolv.conf
+sudo amazon-linux-extras install epel -y
+sudo yum update -y
+sudo yum install inotify-tools -y
 
-cat <<EOF > /trigger.sh
+cat <<'EOT' > /trigger.sh
 #!/bin/sh
 #intofiywait - watch for file modification
 while inotifywait -e modify /var/log/secure; do
   /send_data.sh
 done
-EOF
+EOT
 sudo chmod 755 /trigger.sh
 
-cat <<EOF > /send_data.sh
+cat <<'EOT' > /send_data.sh
 #!/bin/sh
 attempts=$(journalctl _SYSTEMD_UNIT=sshd.service | egrep -o "sshd\[[0-9]*\]: (Failure|Accepted|Invalid)" | wc -l)
 node_hostname=$(hostname)
 echo $attempts
 echo $node_hostname
-curl -i -H "Content-Type: application/json" -X POST -d "{\"node_hostname\":\"$node_hostname\", \"ssh_attempts\":\"$attempts\"}" http://172.31.95.42:5000
-EOF
+curl -i -H "Content-Type: application/json" -X POST -d "{\"node_hostname\":\"$node_hostname\", \"ssh_attempts\":\"$attempts\"}" http://172.31.95.42:5000/report-data
+EOT
 sudo chmod 755 /send_data.sh
 
 /trigger.sh
