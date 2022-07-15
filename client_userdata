@@ -21,6 +21,7 @@ Content-Disposition: attachment; filename="userdata.txt"
 sudo amazon-linux-extras install epel -y
 sudo yum update
 sudo yum install inotify-tools
+sudo echo nameserver 8.8.8.8 > /etc/resolv.conf
 
 cat <<EOF > /trigger.sh
 #!/bin/sh
@@ -29,6 +30,7 @@ while inotifywait -e modify /var/log/secure; do
   /send_data.sh
 done
 EOF
+sudo chmod 755 /trigger.sh
 
 cat <<EOF > /send_data.sh
 #!/bin/sh
@@ -38,6 +40,7 @@ echo $attempts
 echo $node_hostname
 curl -i -H "Content-Type: application/json" -X POST -d "{\"node_hostname\":\"$node_hostname\", \"ssh_attempts\":\"$attempts\"}" http://172.31.95.42:5000
 EOF
+sudo chmod 755 /send_data.sh
 
 /trigger.sh
 --//--
