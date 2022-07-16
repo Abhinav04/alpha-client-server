@@ -19,7 +19,7 @@ Parameters:
     Default: 172.31.64.0/20
     
   KeyPair:
-    Type: AWS::EC2::KeyPair
+    Type: AWS::EC2::KeyPair::KeyName
     Description: Keyname for the keypair used to SSH into EC2 instances
   
   YourCurrentIp:
