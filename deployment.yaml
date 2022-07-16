@@ -18,7 +18,7 @@ Parameters:
     Type: String
     Default: 172.31.64.0/20
     
-  KeyName:
+  KeyPair:
     Type: AWS::EC2::KeyPair
     Description: Keyname for the keypair used to SSH into EC2 instances
   
@@ -114,6 +114,7 @@ Resources:
     Properties:
       InstanceType: !Ref InstanceType
       ImageId: "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/amzn2-ami-kernel-5.10-hvm-x86_64-gp2}}"
+      KeyName: !Ref KeyPair
       NetworkInterfaces: 
       - DeviceIndex: '0'
         AssociatePublicIpAddress: 'true'
@@ -188,6 +189,7 @@ Resources:
     Properties:
       InstanceType: !Ref InstanceType
       ImageId: "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/amzn2-ami-kernel-5.10-hvm-x86_64-gp2}}"
+      KeyName: !Ref KeyPair
       NetworkInterfaces: 
       - DeviceIndex: '0'
         AssociatePublicIpAddress: 'true'
