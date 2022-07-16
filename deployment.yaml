@@ -196,7 +196,8 @@ Resources:
         GroupSet: [!Ref Ec2SecurityGroup]
         SubnetId: !Ref PublicSubnet2
       UserData:
-        Fn::Base64: !Sub |
+        Fn::Base64: !Sub 
+        - |
           Content-Type: multipart/mixed; boundary="//"
           MIME-Version: 1.0
           
@@ -243,7 +244,6 @@ Resources:
           
           /trigger.sh
           --//--
-        
         - ServerIp:
             !GetAtt EC2InstanceServer.PrivateIp
 
