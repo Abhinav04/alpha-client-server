@@ -15,12 +15,10 @@ A linux based AWS Ec2 instance which runs a simple flask web app. This web app r
 2. You will need an AWS account and an IAM user with permissions to deploy the cloudformation stack.
 3. Go to AWS Console > Services > Cloudformation > Create Stack > Upload a template file and select deployment.yaml
 4. Fill in the parameter values. Values must be provided for "KeyPair" (You will be able to attempt SSH on the client instances using this keypair) and "YourCurrentIp" parameters. Rest of the parameters have a default value provided.
+5. On hitting "Create Stack", the cloudformation stack will be deployed in around 5 minutes.
+6. Go to Services > EC2. You will be able to see 3 client EC2 instances and 1 Server EC2 instance. To SSH into client instance, select the instance checkbox and grab the public IP. You can then use your KeyPair and attempt SSH to the instance. The client instances are part of an Auto-scaling group. The number of instances can be increased/decreased by adjusting the desired, min and max property for the autoscaling group in the cloudformation template.
+7. To get the ssh attempt metrics you can run the below command on a terminal on your machine:
 
-It is always recommended to create AWS Systems Manager parameters following the principles of Infrastructure as Code(IaC). This ensures parameters can be repeatedly deployed across multiple regions/accounts from a single template. However, as of this time AWS Systems Manager Parameter store does not natively support replicating parameters across AWS regions/accounts. If you run into a situation where you may have existing SSM parameters created previously that now need to be copied over to another region/account but no code scripts to fulfill that purpose, we have an APG pattern created for you.
+curl -k -X POST http://server-public-ip:5000/get-data
 
-The code in this repository is related to the APG pattern [Cross-Account and Cross-Region Migration of AWS Systems Manager Parameters](https://apg-library.amazonaws.com/content-viewer/author/ca6167e0-d53d-4623-80a4-91a94ef47af9) which provides detailed instructions on how to use the code.
-
-At a high level, the pattern provides an AWS Lambda function code written and tested in Python 3.8 or later to handle -
-
-- Copying existing AWS Systems Manager parameters to a different supported region in the same AWS account
-- Copying existing AWS Systems Manager parameters to any cross account supported region
+(Replace server-public-ip with Server IP address. You can grab the IP address from EC2 console)
