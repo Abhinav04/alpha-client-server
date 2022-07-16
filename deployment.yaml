@@ -188,69 +188,9 @@ Resources:
           
           python3 /app.py
           --//--
-  
-  # EC2InstanceClient:
-  #   Type: AWS::EC2::Instance
-  #   Properties:
-  #     InstanceType: !Ref InstanceType
-  #     ImageId: "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/amzn2-ami-kernel-5.10-hvm-x86_64-gp2}}"
-  #     KeyName: !Ref KeyPair
-  #     NetworkInterfaces: 
-  #     - DeviceIndex: '0'
-  #       AssociatePublicIpAddress: 'true'
-  #       GroupSet: [!Ref Ec2SecurityGroup]
-  #       SubnetId: !Ref PublicSubnet2
-  #     UserData:
-  #       Fn::Base64: !Sub 
-  #       - |
-  #         Content-Type: multipart/mixed; boundary="//"
-  #         MIME-Version: 1.0
-          
-  #         --//
-  #         Content-Type: text/cloud-config; charset="us-ascii"
-  #         MIME-Version: 1.0
-  #         Content-Transfer-Encoding: 7bit
-  #         Content-Disposition: attachment; filename="cloud-config.txt"
-          
-  #         #cloud-config
-  #         cloud_final_modules:
-  #         - [scripts-user, always]
-          
-  #         --//
-  #         Content-Type: text/x-shellscript; charset="us-ascii"
-  #         MIME-Version: 1.0
-  #         Content-Transfer-Encoding: 7bit
-  #         Content-Disposition: attachment; filename="userdata.txt"
-          
-  #         #!/bin/bash
-  #         sudo echo nameserver 8.8.8.8 > /etc/resolv.conf
-  #         sudo amazon-linux-extras install epel -y
-  #         sudo yum update -y
-  #         sudo yum install inotify-tools -y
-          
-  #         cat <<'EOT' > /trigger.sh
-  #         #!/bin/sh
-  #         #intofiywait - watch for file modification
-  #         while inotifywait -e modify /var/log/secure; do
-  #           /send_data.sh
-  #         done
-  #         EOT
-  #         sudo chmod 755 /trigger.sh
-          
-  #         cat <<'EOT' > /send_data.sh
-  #         #!/bin/sh
-  #         attempts=$(journalctl _SYSTEMD_UNIT=sshd.service | egrep -o "sshd\[[0-9]*\]: (Failure|Accepted|Invalid)" | wc -l)
-  #         node_hostname=$(hostname)
-  #         echo $attempts
-  #         echo $node_hostname
-  #         curl -i -H "Content-Type: application/json" -X POST -d "{\"node_hostname\":\"$node_hostname\", \"ssh_attempts\":\"$attempts\"}" http://${ServerIp}:5000/report-data
-  #         EOT
-  #         sudo chmod 755 /send_data.sh
-          
-  #         /trigger.sh
-  #         --//--
-  #       - ServerIp:
-  #           !GetAtt EC2InstanceServer.PrivateIp
+      Tags:
+        - Key: Name
+          Value: Server
   
   LaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
@@ -326,6 +266,10 @@ Resources:
       VPCZoneIdentifier:
         - !Ref PublicSubnet1
         - !Ref PublicSubnet2
+      Tags:
+        - Key: Name
+          Value: Client
+          PropagateAtLaunch: true
 
 Outputs:
   WebServerIp:
