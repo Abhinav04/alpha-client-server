@@ -313,8 +313,6 @@ Resources:
       DesiredCapacity: 3
       MinSize: 3
       MaxSize: 3
-      HealthCheckType: ELB
-      HealthCheckGracePeriod: !FindInMap [EnvMap, !Ref Environment, AsgHealthGracePeriod]
       LaunchTemplate:
         LaunchTemplateId: !Ref LaunchTemplate
         Version: !GetAtt LaunchTemplate.LatestVersionNumber
