@@ -108,6 +108,11 @@ Resources:
           CidrIp: !Ref YourCurrentIp
           FromPort: 22
           ToPort: 22
+        - Description: Web app access
+          IpProtocol: tcp
+          CidrIp: !Ref YourCurrentIp
+          FromPort: 5000
+          ToPort: 5000
 
   EC2InstanceServer:
     Type: AWS::EC2::Instance
