@@ -237,12 +237,15 @@ Resources:
           node_hostname=$(hostname)
           echo $attempts
           echo $node_hostname
-          curl -i -H "Content-Type: application/json" -X POST -d "{\"node_hostname\":\"$node_hostname\", \"ssh_attempts\":\"$attempts\"}" http://172.31.95.42:5000/report-data
+          curl -i -H "Content-Type: application/json" -X POST -d "{\"node_hostname\":\"$node_hostname\", \"ssh_attempts\":\"$attempts\"}" http://${ServerIp}:5000/report-data
           EOT
           sudo chmod 755 /send_data.sh
           
           /trigger.sh
           --//--
+        
+        - ServerIp:
+            !GetAtt EC2InstanceServer.PrivateIp
 
 Outputs:
   WebServerIp:
